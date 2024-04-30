@@ -35,12 +35,12 @@ def start_scan():
     window.update()
 
     # Log
-    log_directory = os.path.dirname(os.path.realpath(__file__)) + "\\log"
+    log_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "log")
 
     if (os.path.exists(log_directory) == False):
         os.mkdir(log_directory)
 
-    log_full_path = log_directory + "\\scan_log(" + host_ip.get() + ", " + host_start_port.get() + "~" + host_end_port.get() + ").txt"
+    log_full_path = os.path.join(log_directory, "scan_log(" + host_ip.get() + ", " + host_start_port.get() + "~" + host_end_port.get() + ").txt")
 
     with open(log_full_path, 'w') as file:
         file.write("*** Open Port List ***\n")
