@@ -19,11 +19,11 @@ def scan_ports(host, start_port, end_port):
 hostip = input("스캔할 IP 주소를 입력하세요: ")  # 스캔할 대상 IP
 if __name__ == "__main__": 
     start_port = 1
-end_port = 1004
-open_ports = scan_ports(hostip, start_port, end_port)
+    end_port = 1004
+    open_ports = scan_ports(hostip, start_port, end_port)
 
-if open_ports:
-    print(f"열려있는 포트 목록: {hostip}: {open_ports}")
-else:
-    print(f"열려있지 않는 포트 목록: {hostip}.")
+    if open_ports:
+        print(f"열려있는 포트 목록: {hostip}: {open_ports}")
+    else:
+        print(f"열려있지 않는 포트 목록: {hostip}.")
 
