@@ -1,6 +1,6 @@
 import socket
 
-def scan_ports(host, start_port, end_port):
+def start_scan(host, start_port, end_port):
     # 열려있는 포트 목록
     open_ports = []
 
@@ -20,12 +20,12 @@ hostip = input("스캔할 IP 주소를 입력하세요: ")  # 스캔할 대상 I
 if __name__ == "__main__": 
     start_port = 1
     end_port = 1004
-    open_ports = scan_ports(hostip, start_port, end_port)
+    open_ports = start_scan(hostip, start_port, end_port)
 
     if open_ports:
         print(f"열려있는 포트 목록: {hostip}: {open_ports}")
     else:
         print(f"열려있지 않는 포트 목록: {hostip}.")
 
-        
+
 
