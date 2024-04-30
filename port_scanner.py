@@ -27,3 +27,5 @@ if __name__ == "__main__":
     else:
         print(f"열려있지 않는 포트 목록: {hostip}.")
 
+        
+
