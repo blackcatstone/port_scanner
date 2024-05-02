@@ -1,5 +1,4 @@
 import asyncio
-#import socket
 from tkinter import *
 import tkinter as tk
 
