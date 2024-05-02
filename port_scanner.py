@@ -75,7 +75,7 @@ def init_ui(window):
     global ip_var, start_port_var, end_port_var, progress_var, result_var
 
     window.title("Port Scanner")
-    window.geometry("400x350+550+200")
+    window.geometry("400x320+550+200")
     window.resizable(False, False)
 
     # 안내 문구
@@ -106,7 +106,7 @@ def init_ui(window):
     # Buttons
     scan_button = tk.Button(window, text="Start Scan", command=start_scan)
     scan_button.place(x = 16, y = 260, width = 170)
-    save_button = tk.Button(window, text="Start Result", command=save_scan)
+    save_button = tk.Button(window, text="Scan Result", command=save_scan)
     save_button.place(x = 210, y = 260, width = 170)
 
     # Progress and Result Labels
