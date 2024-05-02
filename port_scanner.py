@@ -1,5 +1,4 @@
-import asyncio
-from tkinter import *
+import os, asyncio
 import tkinter as tk
 
 async def scan_port(ip, port):
@@ -27,6 +26,8 @@ async def async_port_scanner(ip, start_port, end_port, progress_callback):
         progress_callback(progress, port, is_open)
         if is_open:
             open_ports.append(port)
+            m = ' Port %d \t[open]' % (port,)
+            log.append(m)
     return open_ports
 
 def update_progress(progress, port, is_open):
@@ -37,57 +38,85 @@ def start_scan():
     ip = ip_var.get()
     start_port = start_port_var.get()
     end_port = end_port_var.get()
+
+    # log
+    global log
+    log = [] # clear the log
+    log.extend([
+        '*** Open Port List ***\n',
+        f' IP:     \t{ip}',
+        f' Ports:   \t[ {start_port} ~ {end_port} ]\n'
+    ])
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, update_progress))
     result_var.set(f"Open ports on {ip}: {open_ports}")
     progress_var.set("Scan complete!")
 
-def init_ui(window):
-    window.title("Port Scanner")
-    window.geometry("320x200")
+def save_scan():
+    ip = ip_var.get()   
+    start_port = start_port_var.get()
+    end_port = end_port_var.get()
 
-    start_position_row = 0
-    position_cul_offset = 1
+    # save the log
+    log_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "log")
+
+    if (os.path.exists(log_directory) == False):
+        os.mkdir(log_directory)
+
+    log_full_path = os.path.join(log_directory, "scan_log(" + str(ip) + ", " + str(start_port) + "~" + str(end_port) + ").txt")
+
+    with open(log_full_path, 'w') as file:
+        file.write('\n'.join(log)) 
+
+def init_ui(window):
+    # 전역 변수 선언
+    global ip_var, start_port_var, end_port_var, progress_var, result_var
+
+    window.title("Port Scanner")
+    window.geometry("400x350+550+200")
+    window.resizable(False, False)
+
+    # 안내 문구
+    L11 = tk.Label(window, text = "스캔 정보를 입력하세요.",  font=("Helvetica", 20))
+    L11.place(x = 20, y = 20)
 
     # IP Address
     host_ip_label = tk.Label(window, text="IP Address:")
-    host_ip_label.grid(row=start_position_row, column=0, sticky=tk.W)
-    global ip_var
+    host_ip_label.place(x = 30, y = 70)
     ip_var = tk.StringVar()
     host_ip = tk.Entry(window, textvariable=ip_var, width=20)
-    host_ip.grid(row=start_position_row, column=position_cul_offset, sticky=tk.W)
+    host_ip.place(x = 180, y = 70)
 
     # Start Port
     start_port_label = tk.Label(window, text="Start Port:")
-    start_port_label.grid(row=start_position_row + 1, column=0, sticky=tk.W)
-    global start_port_var
+    start_port_label.place(x = 30, y = 110)
     start_port_var = tk.IntVar()
     start_port_entry = tk.Entry(window, textvariable=start_port_var, width=20)
-    start_port_entry.grid(row=start_position_row + 1, column=position_cul_offset, sticky=tk.W)
+    start_port_entry.place(x = 180, y = 110)
 
     # End Port
     end_port_label = tk.Label(window, text="End Port:")
-    end_port_label.grid(row=start_position_row + 2, column=0, sticky=tk.W)
-    global end_port_var
+    end_port_label.place(x = 30, y = 150)
     end_port_var = tk.IntVar()
     end_port_entry = tk.Entry(window, textvariable=end_port_var, width=20)
-    end_port_entry.grid(row=start_position_row + 2, column=position_cul_offset, sticky=tk.W)
+    end_port_entry.place(x = 180, y = 150)
 
-    # Start Scan Button
+    # Buttons
     scan_button = tk.Button(window, text="Start Scan", command=start_scan)
-    scan_button.grid(row=start_position_row + 3, column=0, columnspan=2)
+    scan_button.place(x = 16, y = 260, width = 170)
+    save_button = tk.Button(window, text="Start Result", command=save_scan)
+    save_button.place(x = 210, y = 260, width = 170)
 
     # Progress and Result Labels
-    global progress_var
     progress_var = tk.StringVar()
     progress_label = tk.Label(window, textvariable=progress_var)
-    progress_label.grid(row=start_position_row + 4, column=0, columnspan=2)
+    progress_label.place(x = 30, y = 192)
 
-    global result_var
     result_var = tk.StringVar()
     result_label = tk.Label(window, textvariable=result_var)
-    result_label.grid(row=start_position_row + 5, column=0, columnspan=2)
+    result_label.place(x = 30, y = 220)
 
 if __name__ == "__main__":
     window = tk.Tk()
