@@ -51,7 +51,13 @@ def start_scan():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, update_progress))
-    result_var.set(f"Open ports on {ip}: {open_ports}")
+    
+    result_list_box.delete(0, "end")
+
+    for port in  open_ports:
+        result_list_box.insert("end", port)
+    
+    # result_var.set(f"Open ports on {ip}: {open_ports}")
     progress_var.set("Scan complete!")
 
 def save_scan():
@@ -72,7 +78,7 @@ def save_scan():
 
 def init_ui(window):
     # 전역 변수 선언
-    global ip_var, start_port_var, end_port_var, progress_var, result_var
+    global ip_var, start_port_var, end_port_var, progress_var, result_list_box
 
     window.title("Port Scanner")
     window.geometry("400x320+550+200")
@@ -105,18 +111,24 @@ def init_ui(window):
 
     # Buttons
     scan_button = tk.Button(window, text="Start Scan", command=start_scan)
-    scan_button.place(x = 16, y = 260, width = 170)
+    scan_button.place(x = 16, y = 190, width = 170)
     save_button = tk.Button(window, text="Scan Result", command=save_scan)
-    save_button.place(x = 210, y = 260, width = 170)
+    save_button.place(x = 200, y = 190, width = 170)
 
     # Progress and Result Labels
     progress_var = tk.StringVar()
     progress_label = tk.Label(window, textvariable=progress_var)
-    progress_label.place(x = 30, y = 192)
+    progress_label.place(x = 30, y = 170)
 
-    result_var = tk.StringVar()
-    result_label = tk.Label(window, textvariable=result_var)
-    result_label.place(x = 30, y = 220)
+    # Result List Box
+    result_frame = tk.Frame(window)
+    result_frame.place(x = 16, y = 220, width = 350, height = 80)
+    result_list_box = tk.Listbox(result_frame, width=100, height=6)
+    result_list_box.place(x=0, y=0)
+    result_scroll_bar = tk.Scrollbar(result_frame)
+    result_scroll_bar.pack(side="right", fill="y")
+    result_list_box.config(yscrollcommand=result_scroll_bar.set)
+    result_scroll_bar.config(command=result_list_box.yview)
 
 if __name__ == "__main__":
     window = tk.Tk()
