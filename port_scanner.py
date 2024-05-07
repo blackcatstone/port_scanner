@@ -1,6 +1,7 @@
 import os
 from connect_scanner import *
 from xmas_scanner import *
+from ack_scanner import *
 
 def update_progress(progress):
     progress_var.set(f"Progress: {progress:.2f}%")
@@ -45,8 +46,8 @@ def start_scan():
 
     if selected_value == 1:   # TCP Connect
         open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, tcp_connect_scanner, update_progress))
-    # elif selected_value == 2:
-    #     tcp ack scan
+    elif selected_value == 2:
+        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, ack_scanner, update_progress))
     # elif selected_value == 3:
     #     null scan
     elif selected_value == 4: # Xmas
@@ -79,7 +80,7 @@ def init_ui(window):
     global ip_var, start_port_var, end_port_var, selected_radio_value, progress_var, result_list_box
 
     window.title("Port Scanner")
-    window.geometry("400x360+550+200")
+    window.geometry("400x375+550+200")
     window.resizable(False, False)
 
     # 안내 문구
@@ -110,13 +111,13 @@ def init_ui(window):
     # Radio Button
     selected_radio_value = tk.IntVar()
     tcp_connect_radio_button = tk.Radiobutton(window, text="TCP Conn", value=1, variable=selected_radio_value)
-    tcp_connect_radio_button.place(x=16, y=200)
+    tcp_connect_radio_button.place(x=30, y=200)
     tcp_ack_radio_button = tk.Radiobutton(window, text="TCP Ack", value=2, variable=selected_radio_value)
-    tcp_ack_radio_button.place(x=106, y=200)
+    tcp_ack_radio_button.place(x=120, y=200)
     null_radio_button = tk.Radiobutton(window, text="Null", value=3, variable=selected_radio_value)
-    null_radio_button.place(x=196, y=200)
+    null_radio_button.place(x=210, y=200)
     xmas_radio_button = tk.Radiobutton(window, text="Xmas", value=4, variable=selected_radio_value)
-    xmas_radio_button.place(x=286, y=200)
+    xmas_radio_button.place(x=300, y=200)
 
     # Buttons
     scan_button = tk.Button(window, text="Scan", command=start_scan)
@@ -131,7 +132,7 @@ def init_ui(window):
 
     # Result List Box
     result_frame = tk.Frame(window)
-    result_frame.place(x = 16, y = 260, width = 350, height = 80)
+    result_frame.place(x = 20, y = 270, width = 350, height = 80)
     result_list_box = tk.Listbox(result_frame, width=100, height=6)
     result_list_box.place(x=0, y=0)
     result_scroll_bar = tk.Scrollbar(result_frame)
