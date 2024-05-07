@@ -2,6 +2,7 @@ import os
 from connect_scanner import *
 from xmas_scanner import *
 from ack_scanner import *
+from null_scanner import *
 
 def update_progress(progress):
     progress_var.set(f"Progress: {progress:.2f}%")
@@ -46,11 +47,11 @@ def start_scan():
 
     if selected_value == 1:   # TCP Connect
         open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, tcp_connect_scanner, update_progress))
-    elif selected_value == 2:
+    elif selected_value == 2: # ack_scanner
         open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, ack_scanner, update_progress))
-    # elif selected_value == 3:
-    #     null scan
-    elif selected_value == 4: # Xmas
+    elif selected_value == 3: # null_scanner
+        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, null_scanner, update_progress))
+    elif selected_value == 4: # xmas_scanner
         open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, xmas_scanner, update_progress))
 
     for port in open_ports:
@@ -63,7 +64,7 @@ def save_scan():
     ip = ip_var.get()   
     start_port = start_port_var.get()
     end_port = end_port_var.get()
-
+ 
     # save the log
     log_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "log")
 
