@@ -1,4 +1,5 @@
-import os
+import os, asyncio
+import tkinter as tk
 from connect_scanner import *
 from xmas_scanner import *
 from ack_scanner import *
@@ -12,16 +13,16 @@ async def async_port_scanner(ip, start_port, end_port, port_scanner_callback, pr
     ports = range(start_port, end_port + 1)
     total_ports = len(ports)
     tasks = [port_scanner_callback(ip, port) for port in ports]
-    open_ports = []
+    port_states = []
     completed_tasks = 0
     for future in asyncio.as_completed(tasks):
-        port, is_open = await future
+        port, state = await future
         completed_tasks += 1
         progress = (completed_tasks / total_ports) * 100
         progress_callback(progress)
-        if is_open:
-            open_ports.append(port)
-    return open_ports
+        if state in ["Open", "Filtered", "Open or Filtered"]:
+            port_states.append((port, state))
+    return port_states
 
 def start_scan():
     ip = ip_var.get()
@@ -32,7 +33,7 @@ def start_scan():
     global log
     log = [] # clear the log
     log.extend([
-        '*** Open Port List ***\n',
+        '*** Port Scan Result ***\n',
         f' IP:     \t{ip}',
         f' Ports:   \t[ {start_port} ~ {end_port} ]\n'
     ])
@@ -42,21 +43,21 @@ def start_scan():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    open_ports = []
+    port_states = []
     selected_value = selected_radio_value.get()
 
     if selected_value == 1:   # TCP Connect
-        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, tcp_connect_scanner, update_progress))
+        port_states = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, tcp_connect_scanner, update_progress))
     elif selected_value == 2: # ack_scanner
-        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, ack_scanner, update_progress))
+        port_states = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, ack_scanner, update_progress))
     elif selected_value == 3: # null_scanner
-        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, null_scanner, update_progress))
+        port_states = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, null_scanner, update_progress))
     elif selected_value == 4: # xmas_scanner
-        open_ports = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, xmas_scanner, update_progress))
+        port_states = loop.run_until_complete(async_port_scanner(ip, start_port, end_port, xmas_scanner, update_progress))
 
-    for port in open_ports:
-        log.append(' Port %d \t[open]' % (port,))
-        result_list_box.insert("end", port)
+    for (port, state) in port_states:
+        log.append(' Port %d \t[%s]' % (port, state))
+        result_list_box.insert("end", 'Port %d \t[%s]' % (port, state))
     
     progress_var.set("Scan complete!")
 
@@ -81,7 +82,7 @@ def init_ui(window):
     global ip_var, start_port_var, end_port_var, selected_radio_value, progress_var, result_list_box
 
     window.title("Port Scanner")
-    window.geometry("400x375+550+200")
+    window.geometry("400x410+550+200")
     window.resizable(False, False)
 
     # 안내 문구
@@ -112,28 +113,28 @@ def init_ui(window):
     # Radio Button
     selected_radio_value = tk.IntVar()
     tcp_connect_radio_button = tk.Radiobutton(window, text="TCP Conn", value=1, variable=selected_radio_value)
-    tcp_connect_radio_button.place(x=30, y=200)
+    tcp_connect_radio_button.place(x=30, y=210)
     tcp_ack_radio_button = tk.Radiobutton(window, text="TCP Ack", value=2, variable=selected_radio_value)
-    tcp_ack_radio_button.place(x=120, y=200)
+    tcp_ack_radio_button.place(x=120, y=210)
     null_radio_button = tk.Radiobutton(window, text="Null", value=3, variable=selected_radio_value)
-    null_radio_button.place(x=210, y=200)
+    null_radio_button.place(x=210, y=210)
     xmas_radio_button = tk.Radiobutton(window, text="Xmas", value=4, variable=selected_radio_value)
-    xmas_radio_button.place(x=300, y=200)
+    xmas_radio_button.place(x=300, y=210)
 
-    # Buttons
+    # Scan and Save Result Buttons
     scan_button = tk.Button(window, text="Scan", command=start_scan)
-    scan_button.place(x = 16, y = 230, width = 170)
-    save_button = tk.Button(window, text="Scan Result", command=save_scan)
-    save_button.place(x = 200, y = 230, width = 170)
+    scan_button.place(x = 25, y = 245, width = 170)
+    save_button = tk.Button(window, text="Save Result", command=save_scan)
+    save_button.place(x = 205, y = 245, width = 170)
 
     # Progress and Result Labels
     progress_var = tk.StringVar()
     progress_label = tk.Label(window, textvariable=progress_var)
-    progress_label.place(x = 30, y = 170)
+    progress_label.place(x = 30, y = 180)
 
     # Result List Box
     result_frame = tk.Frame(window)
-    result_frame.place(x = 20, y = 270, width = 350, height = 80)
+    result_frame.place(x = 25, y = 290, width = 350, height = 100)
     result_list_box = tk.Listbox(result_frame, width=100, height=6)
     result_list_box.place(x=0, y=0)
     result_scroll_bar = tk.Scrollbar(result_frame)
