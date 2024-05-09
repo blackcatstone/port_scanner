@@ -22,6 +22,7 @@ async def async_port_scanner(ip, start_port, end_port, port_scanner_callback, pr
         progress_callback(progress)
         if state in ["Open", "Filtered", "Open or Filtered"]:
             port_states.append((port, state))
+    port_states.sort(key=lambda x:x[0])
     return port_states
 
 def start_scan():
