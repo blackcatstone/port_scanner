@@ -7,6 +7,6 @@ async def tcp_connect_scanner(ip, port):
         reader, writer = await asyncio.wait_for(conn, timeout=15.0)
         writer.close()
         await writer.wait_closed()
-        return port, True
+        return port, "Open"
     except:
-        return port, False
+        return port, "Closed"
