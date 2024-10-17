@@ -1,6 +1,3 @@
-![image](https://github.com/user-attachments/assets/b87193b3-561a-4518-b3ed-896872c1980b)
-
-
 # port_scanner  
 
 목표 : Port scanner 개발  
@@ -10,6 +7,8 @@
 사용기술 : Python  
 프로젝트 요약 : 포트 스캐너 개발 및 UI 생성  
 Notion : [ Team page](https://heavenly-sponge-d64.notion.site/7827aa9c2b7b4f80be94df7a5d8668c5)  
+
+![image](https://github.com/user-attachments/assets/b87193b3-561a-4518-b3ed-896872c1980b)  
 
 주요 기능 :  
 다양한 포트 검사 기법: TCP Connect, NULL, FIN, XMAS, UDP 등 다양한 포트 검사 기법을 지원  
